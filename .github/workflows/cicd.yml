@@ -24,22 +24,49 @@ jobs:
       - name: Compile
         run: echo Hello, world!
 
+  Pr:
+    name: Dynamic branch on PR
+    if: github.event.number != null # this only runs when in a PR
+    needs: [Build]
+    steps:
+      - run: echo "Deploy code to PR#{{ github.event.number }}"
+      - name: Log into AWS
+        run: "Successfully logged in..."
+
+      - name: Create new PR environment and deploy code
+        run: echo "start of dynamic workflow"
+
   DeployDev:
     name: Deploy to Dev
-    if: github.event_name == 'pull_request'
+    # if: github.event_name == 'pull_request'
+    if: github.ref == 'refs/heads/main'
     needs: [Build]
     runs-on: ubuntu-latest
     environment:
       name: Development
       url: 'http://dev.myapp.com'
     steps:
-      - name: Deploy
+      - name: "Deploy code to dev"
         run: echo 'I am deploying'
+
+      - name: Create new Dev environment and deploy code
+        run: echo "deployed to dev environment"
+
+  QA:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' # only run on the main trunk
+    needs: [DeployDev]
+    steps:
+    - run: echo "Deploy code to QA"
+    - name: Log into AWS
+      run: echo "Logged in to AWS"
+    - name: Create new QA environment and deploy code
+      run: echo "Deployed to QA"
 
   DeployStaging:
     name: Deploy to Staging
     if: github.event.ref == 'refs/heads/main'
-    needs: [Build]
+    needs: [QA]
     runs-on: ubuntu-latest
     environment:
       name: Staging

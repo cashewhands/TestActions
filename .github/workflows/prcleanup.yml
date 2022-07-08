@@ -1,0 +1,15 @@
+name: Delete PR resource group
+
+on:
+  pull_request: 
+    types: [closed]    
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo "Deleting PR#${{ github.event.number }}"
+    - name: Log into AWS
+      run: echo "Logged into AWS" 
+    - name: Clean up PR environment
+      run: echo "Deleting resources on dynamic workflow"
