@@ -57,6 +57,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' # only run on the main trunk
     needs: [DeployDev]
+    environment:
+      name: Development
+      url: 'http://qa.myapp.com'
     steps:
     - run: echo "Deploy code to QA"
     - name: Log into AWS
