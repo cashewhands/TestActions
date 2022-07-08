@@ -27,6 +27,7 @@ jobs:
   Pr:
     name: Dynamic branch on PR
     if: github.event.number != null # this only runs when in a PR
+    runs-on: ubuntu-latest
     needs: [Build]
     steps:
       - run: echo "Deploy code to PR#{{ github.event.number }}"
