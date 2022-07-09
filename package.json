@@ -12,8 +12,8 @@
     "type": "git",
     "url": "git+https://github.com/cashewhands/TestActions.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Demola Adebayo",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/cashewhands/TestActions/issues"
   },
