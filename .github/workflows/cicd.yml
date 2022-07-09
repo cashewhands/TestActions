@@ -98,6 +98,38 @@ jobs:
 
       - name: Create new PR environment and deploy code
         run: echo 'start of dynamic workflow'
+  
+  publish-npm:
+    name: Publish to npm
+    if: github.ref == 'refs/heads/main'
+    needs: [Build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm publish --access public ##NOTE: The NPM API token is stored as an org level secret
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-gpr:
+    name: Publish to github package manager
+    if: github.ref == 'refs/heads/main'
+    needs: [Build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://npm.pkg.github.com/
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   DeployDev:
     name: Deploy to Dev
