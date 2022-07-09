@@ -1,0 +1,19 @@
+{
+  "name": "testactions",
+  "version": "1.0.0",
+  "description": "# Command structure: act [<event>] [options] If no event name passed, will default to \"on: push\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cashewhands/TestActions.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cashewhands/TestActions/issues"
+  },
+  "homepage": "https://github.com/cashewhands/TestActions#readme"
+}
