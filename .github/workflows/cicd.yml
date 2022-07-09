@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Build]
     steps:
-      - run: echo "Deploy code to PR#{{ github.event.number }}"
+      - run: echo "Deploy code to PR#${{ github.event.number }}"
       - name: Log into AWS
         run: echo 'Successfully logged in...'
 
