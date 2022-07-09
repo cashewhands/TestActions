@@ -109,9 +109,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://registry.npmjs.org/@evostreet/testactions
       - run: npm ci
-      - run: npm publish --access public ##NOTE: The NPM API token is stored as an org level secret
+      - run: npm publish --access=public ##NOTE: The NPM API token is stored as an org level secret
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
