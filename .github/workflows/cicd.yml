@@ -18,11 +18,30 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
+    outputs:
+      Version: ${{ steps.gitversion.outputs.buGetVersionV2 }}
+      CommitsSinceVersionSource: ${{ steps.gitVersion.outputs.CommitsSinceVersionSource }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 #fetch-depth is needed for GitVersion
 
       - name: Compile
         run: echo Hello, world!
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        id: gitversion #step id used as reference for output values
+
+      - name: Display GitVersion outputs
+        run: |
+          echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+          echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
 
   Pr:
     name: Dynamic branch on PR
@@ -84,6 +103,21 @@ jobs:
     steps:
       - name: Deploy
         run: echo 'I am deploying'
+      - name: Display GitVersion outputs
+        run: |
+          echo "Version: ${{ needs.Build.outputs.Version  }}"
+          echo "CommitsSinceVersionSource: ${{ needs.Build.outputs.CommitsSinceVersionSource  }}"
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        if: needs.Build.outputs.CommitsSinceVersionSource > 0 #Only create a release if there has been a commit change
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} #this token is provided by Actions, you do not need to create
+        with:
+          tag_name: ${{ needs.Build.outputs.Version }}
+          release_name: Release ${{ needs.Build.outputs.Version  }}
+
 
   DeployProduction:
     name: Deploy to Production
