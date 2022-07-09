@@ -170,7 +170,7 @@ jobs:
   DeployDev:
     name: Deploy to Dev
     # if: github.event_name == 'pull_request'
-    needs: [Build, Parse]
+    needs: [Parse]
     if: ${{ github.ref == 'refs/heads/main' && needs.Parse.outputs.deploy-environment == 'Development' }}
     concurrency:
       group: ${{ format('{0}-{1}', github.workflow, github.job) }}
