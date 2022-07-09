@@ -170,8 +170,8 @@ jobs:
   DeployDev:
     name: Deploy to Dev
     # if: github.event_name == 'pull_request'
-    if: ${{ github.ref == 'refs/heads/main' && needs.Parse.outputs.deploy-environment == Development }}
     needs: [Build, Parse]
+    if: ${{ github.ref == 'refs/heads/main' && needs.Parse.outputs.deploy-environment == 'Development' }}
     concurrency:
       group: ${{ format('{0}-{1}', github.workflow, github.job) }}
     runs-on: ubuntu-latest
