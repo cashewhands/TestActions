@@ -142,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: Staging
-      url: 'http://test.myapp.com'
+      url: 'http://staging.myapp.com'
     steps:
       - name: Deploy
         run: echo 'I am deploying'
