@@ -26,8 +26,48 @@ jobs:
         with:
           fetch-depth: 0 #fetch-depth is needed for GitVersion
 
-      - name: Compile
-        run: echo Hello, world!
+      - name: Setup NodeJS 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install yarn
+        run: npm install -g yarn
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: vivid-cache-yarn-${{ hashFiles('**/package.json') }}
+
+      - name: Install packages
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Build components
+        run: yarn compile
+
+      - name: Cache build
+        uses: actions/cache@v2
+        id: build-cache
+        with:
+          path: |
+            common
+            components
+          key: vivid-cache-build-${{ github.event.pull_request.head.sha }}
+     
+      - name: Upload Safari coverage as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: safari-coverage
+          path: ./coverage/report-cobertura/coverage.xml
       # - name: Determine Version
       #   uses: gittools/actions/gitversion/execute@v0.9.7
       #   with:
