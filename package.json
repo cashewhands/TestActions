@@ -4,7 +4,7 @@
   "description": "# Command structure: act [<event>] [options] If no event name passed, will default to \"on: push\"",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"It definitely works\" "
+    "compile": "echo \"It definitely works\" "
   },
   "repository": {
     "type": "git",
