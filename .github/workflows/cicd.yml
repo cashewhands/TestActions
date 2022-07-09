@@ -63,7 +63,7 @@ jobs:
             components
           key: vivid-cache-build-${{ github.event.pull_request.head.sha }}
      
-      - name: Upload Safari coverage as an artifact
+      - name: Upload coverage as an artifact
         uses: actions/upload-artifact@v2
         with:
           name: safari-coverage
