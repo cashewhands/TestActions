@@ -1,10 +1,8 @@
 name: CI + CD
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  issue_comment:
+    types: [created]
   workflow_dispatch:
     inputs:
       loglevel:
@@ -67,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: 'coverage'
-          path: './coverage/coverage.xml'
+          path: 'coverage/coverage.txt'
 
       - name: Create an issue
         uses: JasonEtco/create-an-issue@v2
@@ -110,6 +108,7 @@ jobs:
       - name: Create new PR environment and deploy code
         run: echo 'start of dynamic workflow'
   
+  
   # publish-npm:
   #   name: Publish to npm
   #   if: github.ref == 'refs/heads/main'
@@ -141,12 +140,34 @@ jobs:
   #     - run: npm publish
   #       env:
   #         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  Parse:
+    name: Consume the issue comment
+    if: ${{ !github.event.issue.pull_request && github.event.comment.body == '/Approved' }}
+    runs-on: ubuntu-latest
+    outputs:
+      deploy-environment: ${{ fromJSON(steps.issue_body_parser.outputs.payload).environment }}
+      ci-run-number: ${{ fromJSON(steps.issue_body_parser.outputs.payload).runNumber }}
+    steps:
+      - name: Comment on Issue      
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: 'Deployment Initiated 🚀'
+          
+      - name: Get Issue Data
+        uses: peter-murray/issue-body-parser-action@v1
+        id: issue_body_parser
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_id: ${{ github.event.issue.number }}         
+          payload_marker: target_payload 
+
 
   DeployDev:
     name: Deploy to Dev
     # if: github.event_name == 'pull_request'
-    if: github.ref == 'refs/heads/main'
-    needs: [Build]
+    if: ${{ github.ref == 'refs/heads/main' && need.Parse.outputs.deploy-environment == "Development" }}
+    needs: [Build, Parse]
     concurrency:
       group: ${{ format('{0}-{1}', github.workflow, github.job) }}
     runs-on: ubuntu-latest
@@ -162,7 +183,7 @@ jobs:
 
   QA:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # only run on the main trunk
+    if: ${{ github.ref == 'refs/heads/main' }} # only run on the main trunk
     needs: [DeployDev]
     concurrency:
       group: ${{ format('{0}-{1}', github.workflow, github.job) }}

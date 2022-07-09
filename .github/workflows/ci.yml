@@ -1,0 +1,32 @@
+name: Pull Request
+
+on:
+  pull-request:
+    branches: [ main ]
+
+  workflow_dispatch:
+    inputs:
+      loglevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
+
+
+jobs:
+  Pr:
+    name: Dynamic branch on PR
+    if: github.event.number != null # this only runs when in a PR
+    runs-on: ubuntu-latest
+    needs: [Build]
+    environment:
+      name: Review
+      url: "http://review-${{ github.event.number }}.lab.github.com"
+    steps:
+      - run: echo "Deploy code to PR#${{ github.event.number }}"
+      - name: Log into AWS
+        run: echo 'Successfully logged in...'
+
+      - name: Create new PR environment and deploy code
+        run: echo 'start of dynamic workflow'
