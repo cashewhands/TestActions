@@ -91,15 +91,15 @@ jobs:
     steps:
       - run: echo "Deploy code to PR#{{ github.event.number }}"
       - name: Log into AWS
-        run: "Successfully logged in..."
+        run: echo 'Successfully logged in...'
 
       - name: Create new PR environment and deploy code
-        run: echo "start of dynamic workflow"
+        run: echo 'start of dynamic workflow'
 
   DeployDev:
     name: Deploy to Dev
-    if: github.event_name == 'pull_request'
-    # if: github.ref == 'refs/heads/main'
+    # if: github.event_name == 'pull_request'
+    if: github.ref == 'refs/heads/main'
     needs: [Build]
     concurrency:
       group: ${{ format('{0}-{1}', github.workflow, github.job) }}
