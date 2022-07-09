@@ -98,8 +98,8 @@ jobs:
 
   DeployDev:
     name: Deploy to Dev
-    # if: github.event_name == 'pull_request'
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'pull_request'
+    # if: github.ref == 'refs/heads/main'
     needs: [Build]
     concurrency:
       group: ${{ format('{0}-{1}', github.workflow, github.job) }}
@@ -121,7 +121,7 @@ jobs:
     concurrency:
       group: ${{ format('{0}-{1}', github.workflow, github.job) }}
     environment:
-      name: Development
+      name: QA
       url: 'http://qa.myapp.com'
     steps:
     - run: echo "Deploy code to QA"
