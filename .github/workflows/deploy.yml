@@ -29,7 +29,7 @@ jobs:
   
   deploy-dev:
     needs: [parse]
-    if: ${{ needs.parse.outputs.deploy-environment == 'Dev' }}
+    if: ${{ needs.parse.outputs.deploy-environment == 'Development' }}
     runs-on: ubuntu-latest
     
     steps:
@@ -51,14 +51,14 @@ jobs:
         name: Create approval Issue for Prod
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENVIRONMENT: Prod
+          ENVIRONMENT: Production
           RUNNUMBER: ${{ needs.parse.outputs.ci-run-number }}
         with:
           filename: .github/deployment-approval.md
     
   deploy-prod:
     needs: [parse]
-    if: ${{ needs.parse.outputs.deploy-environment == 'Prod' }}
+    if: ${{ needs.parse.outputs.deploy-environment == 'Production' }}
     runs-on: ubuntu-latest    
 
     steps:
