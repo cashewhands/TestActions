@@ -108,6 +108,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           filterOutClosed: true
       
+      - name: Show GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       - uses: actions/github-script@0.6.0
         id: prTU
         with:
@@ -127,7 +132,8 @@ jobs:
         with:
           githubToken: ${{secrets.GITHUB_TOKEN}}
           # prNumber: ${{ github.event.number }}
-          prNumber: ${{ github.event.pull_request.number }}
+          # prNumber: ${{ github.event.pull_request.number }}
+          prNumber: ${{ steps.prTU.outputs.results }}
           pushBefore: ' '
           pushAfter: ' '
 
@@ -141,11 +147,6 @@ jobs:
       - name: Run one "build"
         if: contains(steps.file_changes.outputs.files, '"one/')
         run: echo Hello, one!
-
-      - name: Show GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
 
       # - name: Get Branch
       #   id: branch
