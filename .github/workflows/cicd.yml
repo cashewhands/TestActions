@@ -100,6 +100,29 @@ jobs:
 
       - name: Create new PR environment and deploy code
         run: echo 'start of dynamic workflow'
+
+      - name: Get Current Pull Request
+        uses: 8BitJonny/gh-get-current-pr@1.0.1
+        id: pr
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          filterOutClosed: true
+
+      - name: File Changes
+        id: file_changes
+        uses: trilom/file-changes-action@v1.2.3
+        with:
+          # prNumber: ${{ github.event.number }}
+          prNumber: ${{ github.event.pull_request.number }}
+          pushBefore: ''
+          pushAfter: ''
+
+      - name: Output File Changes
+        run: echo '$'
+
+      - name: Run one "build"
+        if: contains(steps.file_changes.outputs.files, '"one/')
+        run: echo Hello, one!
   
   
   # publish-npm:
