@@ -159,7 +159,7 @@ jobs:
 
       - name: Get Hash
         id: hash
-        run: echo "::set-output name=git_sha::$(git rev-parse --short HEAD)"
+        run: echo "::set-output name=git_sha::$(git rev-parse --short $GITHUB_SHA)"
 
       - name: Check Hash
         run: echo "${{ steps.hash.outputs.git_sha }}"
@@ -178,6 +178,13 @@ jobs:
         run: |
           echo "Branch: ${{ steps.vars.outputs.branch }}"
           echo "Sha: ${{ steps.vars.outputs.sha_short }}"
+
+      - name: Add SHORT_SHA env property with commit short sha
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+
+      - name: My Step
+        run: myscript ${SHORT_SHA}
+
 
 
   
