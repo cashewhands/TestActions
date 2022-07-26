@@ -115,41 +115,6 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      # - uses: actions/github-script@0.6.0
-      #   id: prTU
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
-      #     result-encoding: string
-      #     script: |
-      #       const result = await github.repos.listPullRequestsAssociatedWithCommit({
-      #         owner: context.payload.repository.owner.name,
-      #         repo: context.payload.repository.name,
-      #         commit_sha: context.payload.head_commit.sha
-      #       })
-      #       return result.data[0].number;
-
-      # - name: File Changes
-      #   id: file_changes
-      #   uses: trilom/file-changes-action@v1.2.3
-      #   with:
-      #     githubToken: ${{secrets.GITHUB_TOKEN}}
-      #     # prNumber: ${{ github.event.number }}
-      #     prNumber: ${{ github.event.pull_request.number }}
-      #     # prNumber: ${{ steps.prTU.outputs.results }}
-      #     pushBefore: ' '
-      #     pushAfter: ' '
-
-      # - name: Output File Changes
-      #   run: |
-      #     echo '${{ steps.file_changes.outputs.files}}'
-      #     echo '${{ steps.file_changes.outputs.files_modified}}'
-      #     echo '${{ steps.file_changes.outputs.files_added}}'
-      #     echo '${{ steps.file_changes.outputs.files_removed}}'
-
-      # - name: Run one "build"
-      #   if: contains(steps.file_changes.outputs.files, '"one/')
-      #   run: echo Hello, one!
-
       - name: Get Branch
         id: branch
         run: echo "git_branch=${GITHUB_REF#refs/heads/}"
@@ -184,6 +149,41 @@ jobs:
 
       - name: My Step
         run: echo ${SHORT_SHA}
+
+      - uses: actions/github-script@0.6.0
+        id: prTU
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = await github.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.payload.repository.owner.name,
+              repo: context.payload.repository.name,
+              commit_sha: context.payload.pull_request.head.sha
+            })
+            return result.data[0].number;
+
+      - name: File Changes
+        id: file_changes
+        uses: trilom/file-changes-action@v1.2.3
+        with:
+          githubToken: ${{secrets.GITHUB_TOKEN}}
+          # prNumber: ${{ github.event.number }}
+          prNumber: ${{ github.event.pull_request.number }}
+          # prNumber: ${{ steps.prTU.outputs.results }}
+          pushBefore: ' '
+          pushAfter: ' '
+
+      - name: Output File Changes
+        run: |
+          echo '${{ steps.file_changes.outputs.files}}'
+          echo '${{ steps.file_changes.outputs.files_modified}}'
+          echo '${{ steps.file_changes.outputs.files_added}}'
+          echo '${{ steps.file_changes.outputs.files_removed}}'
+
+      - name: Run one "build"
+        if: contains(steps.file_changes.outputs.files, '"one/')
+        run: echo Hello, one!
 
 
 
