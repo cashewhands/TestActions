@@ -209,7 +209,7 @@ jobs:
 
   Lint:
     name: Linting branch on PR
-    if: github.event.number != null
+    # if: github.event.number != null
     runs-on: ubuntu-latest
     # require the second job to have ran
     needs: [Pr]
