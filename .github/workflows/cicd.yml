@@ -208,8 +208,9 @@ jobs:
           echo "::set-output name=ts::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
 
   Lint:
-    runs-on: ubuntu-latest
+    name: Linting branch on PR
     if: github.event.number != null
+    runs-on: ubuntu-latest
     # require the second job to have ran
     needs: [Pr]
     # only run there are changed files
