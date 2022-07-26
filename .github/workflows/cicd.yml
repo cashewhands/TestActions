@@ -94,6 +94,8 @@ jobs:
       name: Review
       url: "http://review-${{ github.event.number }}.lab.github.com"
     steps:
+      - uses: actions/checkout@v2
+        
       - run: echo "Deploy code to PR#${{ github.event.number }}"
       - name: Log into AWS
         run: echo 'Successfully logged in...'
