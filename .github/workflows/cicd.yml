@@ -169,8 +169,8 @@ jobs:
         with:
           githubToken: ${{secrets.GITHUB_TOKEN}}
           # prNumber: ${{ github.event.number }}
-          prNumber: ${{ github.event.pull_request.number }}
-          # prNumber: ${{ steps.prTU.outputs.results }}
+          # prNumber: ${{ github.event.pull_request.number }}
+          prNumber: ${{ steps.prTU.outputs.results }}
           pushBefore: ' '
           pushAfter: ' '
 
