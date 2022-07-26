@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       all: ${{ steps.changes.outputs.all}}
-      ts: ${{ steps.changes.outputs.js }}
+      js: ${{ steps.changes.outputs.js }}
     needs: [Build]
     environment:
       name: Review
