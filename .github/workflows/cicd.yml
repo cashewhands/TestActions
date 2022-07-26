@@ -122,45 +122,45 @@ jobs:
             const result = await github.repos.listPullRequestsAssociatedWithCommit({
               owner: context.payload.repository.owner.name,
               repo: context.payload.repository.name,
-              commit_sha: context.payload.sha
+              commit_sha: context.payload.head_commit.sha
             })
             return result.data[0].number;
 
-      - name: File Changes
-        id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
-        with:
-          githubToken: ${{secrets.GITHUB_TOKEN}}
-          # prNumber: ${{ github.event.number }}
-          prNumber: ${{ github.event.pull_request.number }}
-          # prNumber: ${{ steps.prTU.outputs.results }}
-          pushBefore: ' '
-          pushAfter: ' '
+      # - name: File Changes
+      #   id: file_changes
+      #   uses: trilom/file-changes-action@v1.2.3
+      #   with:
+      #     githubToken: ${{secrets.GITHUB_TOKEN}}
+      #     # prNumber: ${{ github.event.number }}
+      #     prNumber: ${{ github.event.pull_request.number }}
+      #     # prNumber: ${{ steps.prTU.outputs.results }}
+      #     pushBefore: ' '
+      #     pushAfter: ' '
 
-      - name: Output File Changes
-        run: |
-          echo '${{ steps.file_changes.outputs.files}}'
-          echo '${{ steps.file_changes.outputs.files_modified}}'
-          echo '${{ steps.file_changes.outputs.files_added}}'
-          echo '${{ steps.file_changes.outputs.files_removed}}'
+      # - name: Output File Changes
+      #   run: |
+      #     echo '${{ steps.file_changes.outputs.files}}'
+      #     echo '${{ steps.file_changes.outputs.files_modified}}'
+      #     echo '${{ steps.file_changes.outputs.files_added}}'
+      #     echo '${{ steps.file_changes.outputs.files_removed}}'
 
-      - name: Run one "build"
-        if: contains(steps.file_changes.outputs.files, '"one/')
-        run: echo Hello, one!
+      # - name: Run one "build"
+      #   if: contains(steps.file_changes.outputs.files, '"one/')
+      #   run: echo Hello, one!
 
-      # - name: Get Branch
-      #   id: branch
-      #   run: echo "git_branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_BRANCH
+      - name: Get Branch
+        id: branch
+        run: echo "git_branch=${GITHUB_REF#refs/heads/}"
 
-      # - name: Check Branch
-      #   run: echo "${{ env.branch }}"
+      - name: Check Branch
+        run: echo "${{ steps.branch.outputs.git_branch }}"
 
-      # - name: Get Hash
-      #   id: hash
-      #   run: echo "git_hash=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_HASH
+      - name: Get Hash
+        id: hash
+        run: echo "git_hash=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
 
-      # - name: Check Hash
-      #   run: echo "${{ env.hash }}"
+      - name: Check Hash
+        run: echo "${{ env.hash }}"
 
       - name: Show Github SHA
         run: echo ${{ github.event.pull_request.head.sha }}
