@@ -89,6 +89,9 @@ jobs:
     name: Dynamic branch on PR
     if: github.event.number != null # this only runs when in a PR
     runs-on: ubuntu-latest
+    outputs:
+      all: ${{ steps.changes.outputs.all}}
+      ts: ${{ steps.changes.outputs.ts }}
     needs: [Build]
     environment:
       name: Review
@@ -197,6 +200,22 @@ jobs:
             echo "$file was changed"
           done
 
+      - name: Get changed files
+        id: changes
+        # Set outputs using the command.
+        run: |
+          echo "::set-output name=all::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
+          echo "::set-output name=ts::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
+
+  Lint:
+    runs-on: ubuntu-latest
+    # require the second job to have ran
+    needs: Pr
+    # only run there are changed files
+    if: ${{needs.Pr.outputs.ts}}
+    steps:
+      - name: echo changed files
+        run: echo ${{needs.Pr.outputs.ts}}
 
 
   
