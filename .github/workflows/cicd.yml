@@ -210,7 +210,7 @@ jobs:
   Lint:
     runs-on: ubuntu-latest
     # require the second job to have ran
-    needs: Pr
+    needs: [Pr]
     # only run there are changed files
     if: ${{needs.Pr.outputs.ts}}
     steps:
