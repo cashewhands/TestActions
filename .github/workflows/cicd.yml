@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       all: ${{ steps.changes.outputs.all}}
-      ts: ${{ steps.changes.outputs.ts }}
+      ts: ${{ steps.changes.outputs.js }}
     needs: [Build]
     environment:
       name: Review
@@ -205,7 +205,7 @@ jobs:
         # Set outputs using the command.
         run: |
           echo "::set-output name=all::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
-          echo "::set-output name=ts::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
+          echo "::set-output name=js::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .js$ | xargs)"
 
   Lint:
     name: Linting branch on PR
@@ -217,7 +217,7 @@ jobs:
     if: github.event.number != null && ${{needs.Pr.outputs.ts}}
     steps:
       - name: echo changed files
-        run: echo ${{needs.Pr.outputs.ts}}
+        run: echo ${{ needs.Pr.outputs.js }}
 
 
   
