@@ -209,6 +209,7 @@ jobs:
 
   Lint:
     runs-on: ubuntu-latest
+    if: github.event.number != null
     # require the second job to have ran
     needs: [Pr]
     # only run there are changed files
