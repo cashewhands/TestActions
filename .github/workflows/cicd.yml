@@ -157,7 +157,7 @@ jobs:
           result-encoding: string
           script: |
             const result = await github.repos.listPullRequestsAssociatedWithCommit({
-              owner: context.payload.repository.owner.name,
+              owner: context.payload.repository_owner,
               repo: context.payload.repository.name,
               commit_sha: context.payload.pull_request.head.sha
             })
