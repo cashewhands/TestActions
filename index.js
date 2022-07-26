@@ -2,6 +2,7 @@ var express = require('express')
 var app = express();
 
 app.get('/', function(req,res) {
+    console.log("This was added to make it look good!")
     res.send('Hello World!');
 })
 
