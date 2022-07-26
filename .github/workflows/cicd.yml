@@ -95,6 +95,8 @@ jobs:
       url: "http://review-${{ github.event.number }}.lab.github.com"
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
         
       - run: echo "Deploy code to PR#${{ github.event.number }}"
       - name: Log into AWS
@@ -178,12 +180,22 @@ jobs:
         run: |
           echo '${{ steps.file_changes.outputs.files}}'
           echo '${{ steps.file_changes.outputs.files_modified}}'
-          echo '${{ steps.file_changes.outputs.files_added}}'
-          echo '${{ steps.file_changes.outputs.files_removed}}'
+          echo '${{ steps.file_changes.outputs.files_added }}'
+          echo '${{ steps.file_changes.outputs.files_removed }}'
 
       - name: Run one "build"
         if: contains(steps.file_changes.outputs.files, '"one/')
         run: echo Hello, one!
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v14.6
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
 
 
 
