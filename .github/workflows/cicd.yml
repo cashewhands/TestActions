@@ -15,6 +15,35 @@ on:
         description: 'Test scenario tags'
 
 jobs:
+  Lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo changed files
+        run: echo "Running Linting..."
+
+  Unit-Test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2
+
+      - name: use cache 
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: echo "Running Test..."
+
+
   Build:
     runs-on: ubuntu-latest
     # outputs:
@@ -216,7 +245,7 @@ jobs:
           echo "::set-output name=all::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
           echo "::set-output name=js::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .js$ | xargs)"
 
-  Lint:
+  Lint-Pr:
     name: Linting branch on PR
     # if: github.event.number != null
     runs-on: ubuntu-latest
@@ -229,8 +258,6 @@ jobs:
         run: echo ${{ needs.Pr.outputs.js }}
 
 
-  
-  
   # publish-npm:
   #   name: Publish to npm
   #   if: github.ref == 'refs/heads/main'
