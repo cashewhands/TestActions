@@ -92,6 +92,10 @@ jobs:
     outputs:
       all: ${{ steps.changes.outputs.all}}
       js: ${{ steps.changes.outputs.js }}
+    env:
+      PR_NUMBER: ${{ github.event.number }}
+      BRANCH: ${{ github.head_ref }}
+      STAGE: pr${{ github.event.number }}
     needs: [Build]
     environment:
       name: Review
@@ -189,6 +193,12 @@ jobs:
       - name: Run one "build"
         if: contains(steps.file_changes.outputs.files, '"one/')
         run: echo Hello, one!
+      
+      - name: Output All env
+        run: |
+          echo 'BRANCH: ${{ env.BRANCH }}'
+          echo 'PR_NUMBER: ${{ env.PR_NUMBER }}'
+          echo '${{ env.STAGE }}'
 
       - name: Get changed files
         id: changed-files
