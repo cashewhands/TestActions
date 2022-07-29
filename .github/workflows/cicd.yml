@@ -89,11 +89,22 @@ jobs:
     name: Dynamic branch on PR
     if: github.event.number != null # this only runs when in a PR
     runs-on: ubuntu-latest
+    outputs:
+      all: ${{ steps.changes.outputs.all}}
+      js: ${{ steps.changes.outputs.js }}
+    env:
+      PR_NUMBER: ${{ github.event.number }}
+      BRANCH: ${{ github.head_ref }}
+      STAGE: pr${{ github.event.number }}
     needs: [Build]
     environment:
       name: Review
       url: "http://review-${{ github.event.number }}.lab.github.com"
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+        
       - run: echo "Deploy code to PR#${{ github.event.number }}"
       - name: Log into AWS
         run: echo 'Successfully logged in...'
@@ -107,22 +118,118 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           filterOutClosed: true
+      
+      - name: Show GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: Get Branch
+        id: branch
+        run: echo "git_branch=${GITHUB_REF#refs/heads/}"
+
+      - name: Check Branch
+        run: echo "${{ steps.branch.outputs.git_branch }}"
+
+      - name: Get Hash
+        id: hash
+        run: echo "::set-output name=git_sha::$(git rev-parse --short $GITHUB_SHA)"
+
+      - name: Check Hash
+        run: echo "${{ steps.hash.outputs.git_sha }}"
+
+      - name: Show Github SHA
+        run: echo ${{ github.event.pull_request.head.sha }}
+
+      - name: Declare some variables
+        id: vars
+        shell: bash
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Retrieve the branch and sha
+        run: |
+          echo "Branch: ${{ steps.vars.outputs.branch }}"
+          echo "Sha: ${{ steps.vars.outputs.sha_short }}"
+
+      - name: Add SHORT_SHA env property with commit short sha
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+
+      - name: My Step
+        run: echo ${SHORT_SHA}
+
+      - uses: actions/github-script@0.6.0
+        id: prTU
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = await github.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.payload.repository.owner.login,
+              repo: context.payload.repository.name,
+              commit_sha: context.payload.pull_request.head.sha
+            })
+            return result.data[0].number;
 
       - name: File Changes
         id: file_changes
         uses: trilom/file-changes-action@v1.2.3
         with:
+          githubToken: ${{secrets.GITHUB_TOKEN}}
           # prNumber: ${{ github.event.number }}
-          prNumber: ${{ github.event.pull_request.number }}
-          pushBefore: ''
-          pushAfter: ''
+          # prNumber: ${{ github.event.pull_request.number }}
+          prNumber: ${{ steps.prTU.outputs.results }}
+          pushBefore: ${{ github.event.before }}
+          pushAfter: ${{ github.event.after }}
 
       - name: Output File Changes
-        run: echo '$'
+        run: |
+          echo '${{ steps.file_changes.outputs.files}}'
+          echo '${{ steps.file_changes.outputs.files_modified}}'
+          echo '${{ steps.file_changes.outputs.files_added }}'
+          echo '${{ steps.file_changes.outputs.files_removed }}'
 
       - name: Run one "build"
         if: contains(steps.file_changes.outputs.files, '"one/')
         run: echo Hello, one!
+      
+      - name: Output All env
+        run: |
+          echo 'BRANCH: ${{ env.BRANCH }}'
+          echo 'PR_NUMBER: ${{ env.PR_NUMBER }}'
+          echo '${{ env.STAGE }}'
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v14.6
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+
+      - name: Get changed files
+        id: changes
+        # Set outputs using the command.
+        run: |
+          echo "::set-output name=all::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
+          echo "::set-output name=js::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .js$ | xargs)"
+
+  Lint:
+    name: Linting branch on PR
+    # if: github.event.number != null
+    runs-on: ubuntu-latest
+    # require the second job to have ran
+    needs: [Pr]
+    # only run there are changed files
+    if: github.event.number != null && ${{needs.Pr.outputs.ts}}
+    steps:
+      - name: echo changed files
+        run: echo ${{ needs.Pr.outputs.js }}
+
+
   
   
   # publish-npm:
