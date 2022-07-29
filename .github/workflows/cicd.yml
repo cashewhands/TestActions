@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request: 
     branches: [main]
+  issue_comment:
   workflow_dispatch:
     inputs:
       loglevel:
@@ -13,6 +14,11 @@ on:
         default: 'warning'
       tags:
         description: 'Test scenario tags'
+
+#added when doing Pr-Commented, issue_comment
+permissions:
+  issues: write
+  contents: read
 
 jobs:
   Lint:
@@ -24,6 +30,7 @@ jobs:
 
   Unit-Test:
     name: Unit Test
+    needs: [Lint]
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
@@ -43,6 +50,19 @@ jobs:
       - name: Run unit tests
         run: echo "Running Test..."
 
+  Codecov:
+    needs: [Unit-Test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2 
+
+      - name: Upload coverage from test to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: coverage.xml
+          name: test-codecov
+          fail_ci_if_error: false
 
   Build:
     runs-on: ubuntu-latest
@@ -257,6 +277,19 @@ jobs:
       - name: echo changed files
         run: echo ${{ needs.Pr.outputs.js }}
 
+  Pr-Commented:
+    name: PR comment
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/run tests') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: Display branch name
+        run: |
+          echo "branch=$(echo "${{ github.event.comment.body }}" | cut -d " " -f 3)" >> $GITHUB_ENV
 
   # publish-npm:
   #   name: Publish to npm
