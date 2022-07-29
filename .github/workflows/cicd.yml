@@ -14,7 +14,6 @@ on:
       tags:
         description: 'Test scenario tags'
 
-
 jobs:
   Build:
     runs-on: ubuntu-latest
