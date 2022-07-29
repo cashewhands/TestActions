@@ -14,16 +14,7 @@ jobs:
         with:
         #   #Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
-      - name: Upload coverage as an artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: 'coverage'
-          path: 'coverage/coverage.txt'
-          
-      - uses: actions/download-artifact@v3
-        with:
-          name: coverage
-
+      
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         with:
