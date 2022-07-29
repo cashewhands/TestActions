@@ -18,11 +18,9 @@ jobs:
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         with:
-          # projectBaseDir: TestActions
           args: >
             -Dsonar.organization=cashewhands
-            -Dsonar.projectKey=cashewhands_TestActions
-               
+            -Dsonar.projectKey=cashewhands_TestActions       
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
