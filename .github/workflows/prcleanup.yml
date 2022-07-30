@@ -28,9 +28,9 @@ jobs:
       - name: Clean up PR environment
         run: echo "Deleting resources on dynamic workflow"
 
-      - name: Notify via Endid
-        uses: endid-app/endid-github-action@v2.1
-        if: always()
-        with:
-          token: ${{ secrets.ENDID_TOKEN }}
-          status: ${{ job.status == 'success' && needs.tests.result == 'success' }}
+      # - name: Notify via Endid
+      #   uses: endid-app/endid-github-action@v2.1
+      #   if: always()
+      #   with:
+      #     token: ${{ secrets.ENDID_TOKEN }}
+      #     status: ${{ job.status == 'success' && needs.tests.result == 'success' }}

@@ -22,7 +22,7 @@ const server = app.listen(PORT, async function() {
     console.log('Server listening at http://127.0.0.1:%s', port);
 });
 
-app.get('/', (req,res) => res.send('API Running!'));
+app.get('/', (_req,res) => res.send('API Running!'));
 
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (err, promise) => {
