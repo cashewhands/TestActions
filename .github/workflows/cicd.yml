@@ -48,10 +48,32 @@ jobs:
         run: npm install
 
       - name: Run unit tests
-        run: echo "Running Test..."
+        run: npm run test
+
+  Integration-Test:
+    name: Unit Test
+    needs: [Lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2
+
+      - name: use cache 
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run integration tests
+        run: echo "Integration testing"
 
   Codecov:
-    needs: [Unit-Test]
+    needs: [Unit-Test, Integration-Test]
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
