@@ -272,7 +272,7 @@ jobs:
     # require the second job to have ran
     needs: [Pr]
     # only run there are changed files
-    if: github.event.number != null && ${{needs.Pr.outputs.ts}}
+    if: github.event.number != null && ${{needs.Pr.outputs.js}}
     steps:
       - name: echo changed files
         run: echo ${{ needs.Pr.outputs.js }}
