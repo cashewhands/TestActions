@@ -1,6 +1,11 @@
-var express = require('express')
-var app = express();
+let express = require('express')
+let app = express();
 
+app.disable("x-powered-by");
+
+// let helmet = require("helmet");
+// let app2 = express(); // Compliant
+// app2.use(helmet.hidePoweredBy());
 app.get('/', function(req,res) {
     console.log("This was added to make it look good!")
     res.send('Hello World!');
