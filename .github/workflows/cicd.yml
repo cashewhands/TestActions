@@ -16,9 +16,9 @@ on:
         description: 'Test scenario tags'
 
 #added when doing Pr-Commented, issue_comment
-permissions:
-  issues: write
-  contents: read
+# permissions:
+#   issues: write
+#   contents: read
 
 jobs:
   
@@ -236,19 +236,19 @@ jobs:
       - name: echo changed files
         run: echo ${{ needs.Pr.outputs.js }}
 
-  Pr-Commented:
-    name: PR comment
-    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/run tests') }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout repo content
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+  # Pr-Commented:
+  #   name: PR comment
+  #   if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/run tests') }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: checkout repo content
+  #       uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 0
       
-      - name: Display branch name
-        run: |
-          echo "branch=$(echo "${{ github.event.comment.body }}" | cut -d " " -f 3)" >> $GITHUB_ENV
+  #     - name: Display branch name
+  #       run: |
+  #         echo "branch=$(echo "${{ github.event.comment.body }}" | cut -d " " -f 3)" >> $GITHUB_ENV
 
   # publish-npm:
   #   name: Publish to npm
