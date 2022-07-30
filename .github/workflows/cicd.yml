@@ -51,7 +51,7 @@ jobs:
         run: npm run test
 
   Integration-Test:
-    name: Unit Test
+    name: Integration Test
     needs: [Lint]
     runs-on: ubuntu-latest
     steps:
@@ -73,7 +73,7 @@ jobs:
         run: echo "Integration testing"
 
   Codecov:
-    needs: [Unit-Test, Integration-Test]
+    needs: [Unit-Test,Integration-Test]
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
