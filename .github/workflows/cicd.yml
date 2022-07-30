@@ -88,6 +88,9 @@ jobs:
 
   Build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
     # outputs:
     #   Version: ${{ steps.gitversion.outputs.buGetVersionV2 }}
     #   CommitsSinceVersionSource: ${{ steps.gitVersion.outputs.CommitsSinceVersionSource }}
@@ -99,7 +102,7 @@ jobs:
       - name: Setup NodeJS 14
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: ${{ matrix.node-version }}
 
       - name: Install yarn
         run: npm install -g yarn

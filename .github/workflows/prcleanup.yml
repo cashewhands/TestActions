@@ -5,11 +5,32 @@ on:
     types: [closed]    
 
 jobs:
-  cleanup:
-    runs-on: ubuntu-latest
+  tests:
+    name: Run Tests
     steps:
-    - run: echo "Deleting PR#${{ github.event.number }}"
-    - name: Log into AWS
-      run: echo "Logged into AWS" 
-    - name: Clean up PR environment
-      run: echo "Deleting resources on dynamic workflow"
+      - name: Run the test suite
+        run: exit 0
+
+  cleanup:
+    name: Tear Down
+    needs: [tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Tear Down
+        run: exit 0
+
+      - name: Removing with PR number
+        run: echo "Deleting PR#${{ github.event.number }}"
+
+      - name: Log into AWS
+        run: echo "Logged into AWS" 
+      - name: Clean up PR environment
+        run: echo "Deleting resources on dynamic workflow"
+
+      - name: Notify via Endid
+        uses: endid-app/endid-github-action@v2.1
+        if: always()
+        with:
+          token: ${{ secrets.ENDID_TOKEN }}
+          status: ${{ job.status == 'success' && needs.tests.result == 'success' }}
