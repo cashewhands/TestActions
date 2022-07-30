@@ -227,10 +227,10 @@ jobs:
         with:
           githubToken: ${{secrets.GITHUB_TOKEN}}
           # prNumber: ${{ github.event.number }}
-          prNumber: ${{ github.event.pull_request.number }}
-          # prNumber: ${{ steps.prTU.outputs.results }}
-          # pushBefore: ${{ github.event.before }}
-          # pushAfter: ${{ github.event.after }}
+          # prNumber: ${{ github.event.pull_request.number }}
+          prNumber: ${{ steps.prTU.outputs.results }}
+          pushBefore: ${{ github.event.before }}
+          pushAfter: ${{ github.event.after }}
 
       - name: Output File Changes
         run: |
