@@ -16,12 +16,54 @@ on:
         description: 'Test scenario tags'
 
 #added when doing Pr-Commented, issue_comment
-# permissions:
-#   issues: write
-#   contents: read
+permissions:
+  issues: write
+  contents: read
 
 jobs:
-  
+  Lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo changed files
+        run: echo "Running Linting..."
+
+  Unit-Test:
+    name: Unit Test
+    needs: [Lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2
+
+      - name: use cache 
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: echo "Running Test..."
+
+  Codecov:
+    needs: [Unit-Test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2 
+
+      - name: Upload coverage from test to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage/lcov-report/
+          fail_ci_if_error: false
+          verbose: true
+
   Build:
     runs-on: ubuntu-latest
     # outputs:
@@ -187,8 +229,8 @@ jobs:
           # prNumber: ${{ github.event.number }}
           # prNumber: ${{ github.event.pull_request.number }}
           prNumber: ${{ steps.prTU.outputs.results }}
-          pushBefore: ${{ github.event.before }}
-          pushAfter: ${{ github.event.after }}
+          # pushBefore: ${{ github.event.before }}
+          # pushAfter: ${{ github.event.after }}
 
       - name: Output File Changes
         run: |
@@ -236,19 +278,19 @@ jobs:
       - name: echo changed files
         run: echo ${{ needs.Pr.outputs.js }}
 
-  # Pr-Commented:
-  #   name: PR comment
-  #   if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/run tests') }}
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: checkout repo content
-  #       uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
+  Pr-Commented:
+    name: PR comment
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/run tests') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       
-  #     - name: Display branch name
-  #       run: |
-  #         echo "branch=$(echo "${{ github.event.comment.body }}" | cut -d " " -f 3)" >> $GITHUB_ENV
+      - name: Display branch name
+        run: |
+          echo "branch=$(echo "${{ github.event.comment.body }}" | cut -d " " -f 3)" >> $GITHUB_ENV
 
   # publish-npm:
   #   name: Publish to npm
