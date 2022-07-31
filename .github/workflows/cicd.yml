@@ -28,6 +28,9 @@ jobs:
       - name: echo changed files
         run: echo "Running Linting..."
 
+      - name: Linting with @seccl
+        run: npm i @seccl/secclint
+
   Unit-Test:
     name: Unit Test
     needs: [Lint]
