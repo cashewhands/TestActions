@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   call-lint-and-build:
-    uses: ./.github/workflow/_lint.yml@main
+    uses: ./.github/workflows/_lint.yml@main
 
   Unit-Test:
     name: Unit Test
