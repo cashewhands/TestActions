@@ -21,45 +21,12 @@ permissions:
   contents: read
 
 jobs:
-  Lint:
-    name: Linting
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          always-auth: true
-          node-version: ${{ matrix.node-version }}
-          registry-url: https://registry.npmjs.org/
-      - name: Installing Tree
-        run: sudo apt-get install tree
-
-      - name: Showing Tree
-        run: tree -L 4
-
-      - name: Install Dependencies using a safe clean install
-        run: npm ci -- ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN  }}
-
-      # - name: npm install secclint
-      #   run: npx secclint init
-      #   env: 
-      #     NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      - name: Showing Tree
-        run: tree -L 4
-
-      # - name: Linting with @seccl
-        # run: npm i @seccl/secclint
-        # run: npx secclint init
+  call-lint-and-build:
+    uses: TestActions/.github/workflow/_lint.yml@main
 
   Unit-Test:
     name: Unit Test
-    needs: [Lint]
+    needs: call-lint-and-build
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
@@ -81,7 +48,7 @@ jobs:
 
   Integration-Test:
     name: Integration Test
-    needs: [Lint]
+    needs: call-lint-and-build
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code

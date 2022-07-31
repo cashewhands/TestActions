@@ -1,0 +1,38 @@
+name: 🏗 Lint & Build
+
+on: workflow_call
+
+jobs:
+  Lint:
+    name: Linting
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          always-auth: true
+          cache: 'npm'
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://registry.npmjs.org/
+          
+      - name: Installing Tree
+        run: sudo apt-get install tree
+
+      - name: Showing Tree
+        run: tree -L 4
+
+      - name: Install Dependencies using a safe clean install
+        run: npm ci -- ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN  }}
+
+      - name: Lint your code
+        run: npx secclint init
+
+      - name: Showing Tree
+        run: tree -L 4
