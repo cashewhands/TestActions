@@ -37,16 +37,16 @@ jobs:
         run: sudo apt-get install tree
       - name: Showing Tree
         run: tree -L 4
-      - name: npm install
-        run: npm install
+      - name: npm install secclint
+        run: npx secclint init
         env: 
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Showing Tree
         run: tree -L 4
 
-      - name: Linting with @seccl
+      # - name: Linting with @seccl
         # run: npm i @seccl/secclint
-        run: npx secclint init
+        # run: npx secclint init
 
   Unit-Test:
     name: Unit Test
