@@ -22,11 +22,11 @@ permissions:
 
 jobs:
   call-lint-and-build:
-    uses: ./.github/workflows/_lint.yml@main
+    uses: ./.github/workflows/lint.yml@main
 
   Unit-Test:
     name: Unit Test
-    needs: call-lint-and-build
+    needs: [call-lint-and-build]
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
@@ -48,7 +48,7 @@ jobs:
 
   Integration-Test:
     name: Integration Test
-    needs: call-lint-and-build
+    needs: [call-lint-and-build]
     runs-on: ubuntu-latest
     steps:
       - name: Check out source code
