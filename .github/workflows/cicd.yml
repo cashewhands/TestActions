@@ -38,13 +38,13 @@ jobs:
       - name: Showing Tree
         run: tree -L 4
       - name: Setup npmrc
-        run: echo "https://registry.npmjs.org/:_authToken=${{secrets.NPM_AUTH_TOKEN}}" > .npmrc
+        run: echo "https://registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
       - name: npm install 
         run: npm install
       - name: npm install secclint
         run: npx secclint init
         env: 
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Showing Tree
         run: tree -L 4
 
