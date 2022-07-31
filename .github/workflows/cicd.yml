@@ -41,15 +41,16 @@ jobs:
 
       - name: Setup npmrc
         run: |
-          echo "strict-ssl=true\
-                registry=https://registry.npmjs.org" >> .npmrc
-          echo "@seccl:registry=https://registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" >> .npmrc
+          echo "strict-ssl=false\
+                registry=http://registry.npmjs.org" >> .npmrc
+          echo "@seccl:registry=http://registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }} \
+               \#always-auth=true" >> .npmrc
 
       - name: npm install Dependencies
         run: npm ci
 
       - name: npm install secclint
-        run: npm i @seccl/secclint
+        run: npx secclint init
         env: 
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Showing Tree
