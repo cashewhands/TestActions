@@ -29,7 +29,8 @@ jobs:
         run: echo "Running Linting..."
 
       - name: Linting with @seccl
-        run: npm i @seccl/secclint
+        # run: npm i @seccl/secclint
+        run: npx secclint init
 
   Unit-Test:
     name: Unit Test
