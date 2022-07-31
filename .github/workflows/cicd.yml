@@ -35,12 +35,16 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Installing Tree
         run: sudo apt-get install tree
+        
       - name: Showing Tree
         run: tree -L 4
+
       - name: Setup npmrc
         run: echo "https://registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-      - name: npm install 
-        run: npm install
+
+      - name: npm install Dependencies
+        run: npm ci
+
       - name: npm install secclint
         run: npx secclint init
         env: 
