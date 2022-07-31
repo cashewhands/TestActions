@@ -41,13 +41,6 @@ jobs:
       - name: Showing Tree
         run: tree -L 4
 
-      # - name: Setup npmrc
-      #   run: |
-      #     echo "strict-ssl=false\
-      #           registry=http://registry.npmjs.org" >> .npmrc
-      #     echo "@seccl:registry=http://registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }} \
-      #          \#always-auth=true" >> .npmrc
-
       - name: Install Dependencies using a safe clean install
         run: npm ci -- ignore-scripts
         env:
