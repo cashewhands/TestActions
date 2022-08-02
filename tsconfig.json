@@ -1,0 +1,14 @@
+{
+    "extends":"./tsconfig-seccl.json",
+    "compilerOptions": {
+        "outDir": "build",
+        "rootDir": "src"
+    },
+    "exclude": [
+        "build",
+        "coverage",
+        "docs",
+        "test",
+        "tmp"
+    ]
+}
