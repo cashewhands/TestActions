@@ -27,7 +27,12 @@ env:
 
 jobs:
   call-lint-and-build:
-    uses: ./.github/workflows/lint.yml
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Hello its running"
+    # uses: ./.github/workflows/lint.yml
 
   Unit-Test:
     name: Unit Test
