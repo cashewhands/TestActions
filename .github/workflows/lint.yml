@@ -38,10 +38,10 @@ jobs:
       - name: Showing Tree
         run: tree -L 4
 
-      # - name: Install Dependencies using a safe clean install
-      #   run: npm ci --ignore-scripts
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN  }}
+      - name: Install Dependencies using a safe clean install
+        run: npm ci --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN  }}
 
       - name: Lint your code
         run: |
