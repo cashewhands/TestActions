@@ -73,6 +73,6 @@ jobs:
           push-branch: ${{ github.head_ref }}
           commit-message: '${{ matrix.node-version }} adds auto-generated benchmarks and bar graph'
           rebase: 'true' # pull and rebase before commit
-          name: ${{ github.base.user.login }}
+          name: ${{ github.triggering_actor }}
           email: demoladev.ops@gmail.com 
 
