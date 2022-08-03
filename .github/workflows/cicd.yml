@@ -30,9 +30,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "Hello its running"
-    # uses: ./.github/workflows/lint.yml
+      # - run: |
+      #     echo "Hello its running"
+      - name: Linting in progress
+        uses: ./.github/workflows/lint.yml
 
   Unit-Test:
     name: Unit Test
