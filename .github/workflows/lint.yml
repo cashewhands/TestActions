@@ -49,6 +49,7 @@ jobs:
           git config --global user.email "demoladev.ops@gmail.com"
 
           npx secclint init
+          git push
         
 
       - name: Showing Tree
