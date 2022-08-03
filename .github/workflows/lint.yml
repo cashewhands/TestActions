@@ -36,14 +36,6 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - name: Push
-        uses: github-actions-x/commit@v2.9
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          push-branch: ${{ github.head_ref }}
-          commit-message: '${{ matrix.node-version }} adds auto-generated benchmarks and bar graph'
-          rebase: 'true' # pull and rebase before commit
-
       - name: Installing Tree
         run: sudo apt-get install tree
 
@@ -62,7 +54,7 @@ jobs:
 
           npx secclint init
 
-      - name: Git Push
+      - name: Will rename push
         run: |
           echo "pushing in progress"
           # git branch temp-branch
@@ -73,3 +65,12 @@ jobs:
 
       - name: Showing Tree
         run: tree -L 4
+
+      - name: Push
+        uses: github-actions-x/commit@v2.9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          push-branch: ${{ github.head_ref }}
+          commit-message: '${{ matrix.node-version }} adds auto-generated benchmarks and bar graph'
+          rebase: 'true' # pull and rebase before commit
+
