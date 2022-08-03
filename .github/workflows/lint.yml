@@ -24,7 +24,6 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           scope: "@seccl"
         
-
       - name: Setup .npmrc
         uses: bikutadesu/create-npmrc@v1.0.0
         with:
@@ -36,6 +35,14 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
+
+      - name: Push
+        uses: github-actions-x/commit@v2.9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          push-branch: ${{ github.head_ref }}
+          commit-message: '${{ matrix.node-version }} adds auto-generated benchmarks and bar graph'
+          rebase: 'true' # pull and rebase before commit
 
       - name: Installing Tree
         run: sudo apt-get install tree
