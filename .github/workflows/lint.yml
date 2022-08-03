@@ -32,6 +32,11 @@ jobs:
           auth_token: ${{ secrets.NPM_TOKEN  }}
           always_auth: true
 
+      - name: Show GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       - name: Installing Tree
         run: sudo apt-get install tree
 
@@ -52,10 +57,11 @@ jobs:
 
       - name: Git Push
         run: |
-          git branch temp-branch
-          git checkout test-branch
-          git merge temp-branch
-          git push origin test-branch
+          echo "pushing in progress"
+          # git branch temp-branch
+          # git checkout test-branch
+          # git merge temp-branch
+          # git push origin test-branch
         
 
       - name: Showing Tree
