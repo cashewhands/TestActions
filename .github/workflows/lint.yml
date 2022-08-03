@@ -53,9 +53,9 @@ jobs:
       - name: Git Push
         run: |
           git branch temp-branch
-          git checkout main
+          git checkout test-branch
           git merge temp-branch
-          git push origin main
+          git push origin test-branch
         
 
       - name: Showing Tree
