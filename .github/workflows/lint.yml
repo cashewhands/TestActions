@@ -22,7 +22,7 @@ jobs:
           cache: 'npm'
           node-version: ${{ matrix.node-version }}
           registry-url: "https://registry.npmjs.org"
-          scope: "@seccl"
+          # scope: "@seccl"
         
       - name: Setup .npmrc
         uses: bikutadesu/create-npmrc@v1.0.0
@@ -52,8 +52,13 @@ jobs:
           git config --global user.name "Lint Bot"
           git config --global user.email "demoladev.ops@gmail.com"
 
-          npx secclint init
+          # npx secclint init
 
+      - name: trying stuff
+        run: >
+          echo "User ${{ github.event.inputs.username }} ran a workflow"
+          echo "because ${{ github.event.inputs.reason }}."
+          
       - name: Will rename push
         run: |
           echo "pushing in progress"
