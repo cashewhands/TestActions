@@ -2,9 +2,8 @@ name: CI + CD
 
 on:
   push:
-    branches: [main]
   pull_request: 
-    branches: [main]
+  issue_comment:
   workflow_dispatch:
     inputs:
       loglevel:
@@ -14,9 +13,96 @@ on:
       tags:
         description: 'Test scenario tags'
 
+#added when doing Pr-Commented, issue_comment
+permissions:
+  checks: write
+  issues: write
+  contents: read
+  pull-requests: write
+
+env:
+  NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN  }}
+
 jobs:
+  call-lint-and-build:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Linting in progress
+        # uses: ./.github/workflows/lint.yml
+        run: |
+          echo "Hello its running"
+
+  Unit-Test:
+    name: Unit Test
+    needs: [call-lint-and-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2
+
+      - name: use cache 
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Upload Unit Test Results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Unit Test Results 
+          path: coverage/xunit.xml
+
+  Integration-Test:
+    name: Integration Test
+    needs: [call-lint-and-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2
+
+      - name: use cache 
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run integration tests
+        run: echo "Integration testing"
+
+  Codecov:
+    needs: [Unit-Test,Integration-Test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2 
+
+      - name: Upload coverage from test to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage/lcov-report/
+          fail_ci_if_error: false
+          verbose: true
+
   Build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
     # outputs:
     #   Version: ${{ steps.gitversion.outputs.buGetVersionV2 }}
     #   CommitsSinceVersionSource: ${{ steps.gitVersion.outputs.CommitsSinceVersionSource }}
@@ -28,30 +114,30 @@ jobs:
       - name: Setup NodeJS 14
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: ${{ matrix.node-version }}
 
-      - name: Install yarn
-        run: npm install -g yarn
+      # - name: Install yarn
+      #   run: npm install -g yarn
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      # - name: Get yarn cache directory path
+      #   id: yarn-cache-dir-path
+      #   run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
 
-      - name: Cache yarn dependencies
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
-            **/node_modules
-          key: vivid-cache-yarn-${{ hashFiles('**/package.json') }}
+      # - name: Cache yarn dependencies
+      #   uses: actions/cache@v2
+      #   id: yarn-cache
+      #   with:
+      #     path: |
+      #       ${{ steps.yarn-cache-dir-path.outputs.dir }}
+      #       **/node_modules
+      #     key: vivid-cache-yarn-${{ hashFiles('**/package.json') }}
 
-      - name: Install packages
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install
+      # - name: Install packages
+      #   if: steps.yarn-cache.outputs.cache-hit != 'true'
+      #   run: yarn install
 
-      - name: Build components
-        run: yarn compile
+      # - name: Build components
+      #   run: yarn compile
 
       - name: Cache build
         uses: actions/cache@v2
@@ -147,6 +233,7 @@ jobs:
           echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
           echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
+
       - name: Retrieve the branch and sha
         run: |
           echo "Branch: ${{ steps.vars.outputs.branch }}"
@@ -173,7 +260,7 @@ jobs:
 
       - name: File Changes
         id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
+        uses: trilom/file-changes-action@v1.2.4
         with:
           githubToken: ${{secrets.GITHUB_TOKEN}}
           # prNumber: ${{ github.event.number }}
@@ -216,21 +303,32 @@ jobs:
           echo "::set-output name=all::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
           echo "::set-output name=js::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .js$ | xargs)"
 
-  Lint:
+  Lint-Pr:
     name: Linting branch on PR
     # if: github.event.number != null
     runs-on: ubuntu-latest
     # require the second job to have ran
     needs: [Pr]
     # only run there are changed files
-    if: github.event.number != null && ${{needs.Pr.outputs.ts}}
+    if: github.event.number != null && ${{needs.Pr.outputs.js}}
     steps:
       - name: echo changed files
         run: echo ${{ needs.Pr.outputs.js }}
 
+  Pr-Commented:
+    name: PR comment
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/run tests') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: Display branch name
+        run: |
+          echo "branch=$(echo "${{ github.event.comment.body }}" | cut -d " " -f 3)" >> $GITHUB_ENV
 
-  
-  
   # publish-npm:
   #   name: Publish to npm
   #   if: github.ref == 'refs/heads/main'
